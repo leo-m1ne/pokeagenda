@@ -1,0 +1,125 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  text-align: center;
+  transition: background 0.5s;
+}
+
+#welcome {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: none;
+}
+
+#welcome h1 {
+  margin-bottom: 5px;
+  color: #fff;
+}
+
+#welcome p {
+  margin-top: 5px;
+  color: #fff;
+}
+
+.btn {
+  padding: 10px 20px;
+  margin-top: 15px;
+  border: none;
+  border-radius: 20px;
+  background: #A1A8C8;
+  text-decoration: none;
+  color: #fff;
+  font-weight: bold;
+}
+
+.page {
+  min-height: 100vh;
+  padding-top: 80px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.page-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background: linear-gradient(to right, #273474, #4354A5);
+  padding: 10px;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-bottom: 2px solid #eee;
+  z-index: 900;
+  color: white;
+}
+
+/* Menú principal */
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+  padding: 20px;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 15px;
+  color: #242424;
+  text-decoration: none;
+  font-weight: bold;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  transition: transform 0.2s, background 0.3s;
+}
+
+.menu-item img {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 10px;
+  object-fit: contain;
+}
+
+.menu-item span {
+  font-size: 1.8rem;
+}
+
+.menu-item:hover {
+  transform: scale(1.05);
+}
+
+.icon-circle {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: #303C7C;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 20px auto;
+}
+
+#time-icon {
+  font-size: 4.5rem;
+  color: #A1A8C8;
+}
+
+.tareas-text {
+  color: #D19D3A; 
+}
+.calendario-text {
+  color: #6481B7; 
+}
+.notas-text {
+  color: #7C5A37;
+}
+.pagos-text {
+  color: #78A1B2; 
+}
