@@ -1,20 +1,441 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <title>PokeAgenda - Pagos</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>PokeAgenda - Pagos</title>
+<style>
+:root{
+  --bg:#FBFBFD; 
+  --primary:#78a1b2; 
+  --ok:#27A96B; 
+  --warn:#F0A500; 
+  --danger:#E94F4F; 
+  --muted:#6B6B76;
+}
+
+body{
+  margin:0; padding:0 0 12px; font-family:Inter, system-ui, sans-serif; background:var(--bg); color:#111;
+}
+.page-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--primary);
+  color:#34373a;
+  padding:16px;
+  font-size:1.4rem;
+  font-weight:700;
+  margin-bottom:14px;
+  border-radius:0;
+  box-shadow:0 4px 12px rgba(10,10,20,0.1);
+  width:100%;
+  position:sticky;
+  top:0;
+  left:0;
+  z-index:10;
+}
+.back-arrow{
+  background:none;
+  border:none;
+  font-size: 20px;
+  font-weight: 900;
+  color:#20170f;
+}
+
+.back-arrow:hover{
+  transform:translateX(-3px);
+}
+
+.content{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.card{
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 4px 12px rgba(10,10,20,0.06);
+  padding:16px;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.next-payment{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.amount{
+  font-size:1.4rem;
+  font-weight:700;
+  color:var(--primary);
+}
+
+.days-left{
+  font-weight:600;
+  font-size:0.85rem;
+}
+
+.week-row{
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-top:10px;
+}
+
+.day{
+  min-width:80px;
+  background:#fbfbff;
+  border-radius:10px;
+  padding:6px;
+  text-align:center;
+}
+
+.btn{
+  display:inline-block;
+  background:var(--primary);
+  color:#fff;
+  text-decoration:none;
+  text-align:center;
+  padding:12px 0;
+  border-radius:10px;
+  font-size:1rem;
+  margin-top:8px;
+}
+
+.action-btn{
+  font-size:0.85rem;
+  padding:8px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
+  width:100%;
+  margin-top:6px;
+}
+
+.add-payment-btn{
+  background:var(--primary);
+  color:#fff;
+  font-size:1.2rem;
+  border:none;
+  border-radius:12px;
+  padding:10px;
+  width:100%;
+  margin:8px 0;
+  cursor:pointer;
+}
+
+.add-payment-btn:hover{
+  opacity:0.9;
+}
+
+/* --- Modal --- */
+.modal{
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.4);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.modal-content{
+  background:#fff;
+  border-radius:12px;
+  padding:16px;
+  width:90%;
+  max-width:400px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.modal-content input{
+  padding:8px;
+  border-radius:8px;
+  border:1px solid #ccc;
+  width:100%;
+  box-sizing:border-box;
+}
+
+.modal-content button{
+  margin-top:8px;
+}
+</style>
 </head>
 <body>
-  <section id="pagos" class="page">
-    <header class="page-header">
-      <h2>Pagos</h2>
-    </header>
-    <div class="content">
-      <p>Aquí aparecerán tus pagos...</p>
-      <a href="menu.html" class="btn">Volver al menú</a>
+<section id="pagos" class="page">
+  <header class="page-header">
+  <button class="back-arrow" onclick="window.location.href='menu.html'">
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>
+  Pagos
+</header>
+  <div class="content">
+    <button class="add-payment-btn" id="add-payment">+ Agregar pago</button>
+
+    <div class="card next-payment" id="next-payment">
+      <div>
+        <div style="color:var(--muted)">Próximo pago</div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:4px">
+          <div class="amount" id="next-amount">—</div>
+          <div class="days-left" id="next-days">—</div>
+        </div>
+        <div style="color:var(--muted);margin-top:4px" id="next-desc">—</div>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="action-btn" id="mark-paid">Marcar pagado</button>
+      </div>
     </div>
-  </section>
+
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:6px">Esta semana</div>
+      <div class="week-row" id="week-row"></div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:6px">Historial reciente</div>
+      <ul id="history" style="color:var(--muted);margin-top:6px"></ul>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700">Pagos próximos</div>
+      <ul id="payments-list" style="color:var(--muted);margin-top:6px"></ul>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700">Ver todos los pagos</div>
+      <ul id="all-payments" style="color:var(--muted);margin-top:6px"></ul>
+    </div>
+
+    <a href="menu.html" class="btn">Volver al menú</a>
+  </div>
+</section>
+
+<!-- Modal Agregar / Editar -->
+<div class="modal" id="payment-modal">
+  <div class="modal-content">
+    <h3 id="modal-title">Nuevo pago</h3>
+    <input type="text" id="modal-name" placeholder="Nombre del pago">
+    <input type="number" id="modal-amount" placeholder="Monto">
+    <input type="date" id="modal-date">
+    <button id="save-payment">Guardar</button>
+    <button id="mark-paid-modal" style="background:var(--ok);color:#fff; display:none;">Marcar como completado</button>
+    <button id="close-modal">Cancelar</button>
+  </div>
+</div>
+
+<!-- Modal Confirmación -->
+<div class="modal" id="confirm-modal">
+  <div class="modal-content">
+    <h3>Confirmar pago</h3>
+    <p id="confirm-text">¿Deseas marcar este pago como completado?</p>
+    <button id="confirm-yes">Sí</button>
+    <button id="confirm-no">No</button>
+  </div>
+</div>
+
+<script>
+const weekRow = document.getElementById("week-row");
+const historyEl = document.getElementById("history");
+const paymentsList = document.getElementById("payments-list");
+const allPayments = document.getElementById("all-payments");
+const nextAmount = document.getElementById("next-amount");
+const nextDays = document.getElementById("next-days");
+const nextDesc = document.getElementById("next-desc");
+
+let payments = JSON.parse(localStorage.getItem("payments")) || [];
+let historial = JSON.parse(localStorage.getItem("historial")) || [];
+let editingIndex = null;
+let week = ["Lun","Mar","Mié","Jue","Vie","Sáb","Dom"];
+let weekAmounts = Array(7).fill(0);
+
+function guardarStorage(){
+  localStorage.setItem("payments", JSON.stringify(payments));
+  localStorage.setItem("historial", JSON.stringify(historial));
+}
+
+function calcularDiasFaltantes(fecha){
+  const hoy = new Date();
+  const venc = new Date(fecha);
+  const diffTime = venc - hoy;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function formatearFecha(fecha){
+  const options = { day: 'numeric', month: 'short', year: 'numeric' };
+  return new Date(fecha).toLocaleDateString('es-MX', options);
+}
+
+function renderWeek(){
+  weekRow.innerHTML = "";
+  const hoy = new Date();
+  const lunes = new Date(hoy);
+  lunes.setDate(hoy.getDate() - hoy.getDay() + 1); 
+  const domingo = new Date(lunes);
+  domingo.setDate(lunes.getDate() + 6); 
+
+  weekAmounts = Array(7).fill(0);
+
+  payments.forEach(p=>{
+    const pDate = new Date(p.date);
+    if(pDate >= lunes && pDate <= domingo){
+      const dayIndex = (pDate.getDay() + 6) % 7; 
+      weekAmounts[dayIndex] = (weekAmounts[dayIndex] || 0) + p.amount;
+    }
+  });
+
+  for(let i=0;i<7;i++){
+    const dayDiv = document.createElement("div");
+    dayDiv.className = "day";
+    dayDiv.innerHTML = `<div style="font-weight:700">${week[i]}</div><div style="font-size:.8rem;color:var(--muted)">$${weekAmounts[i]}</div>`;
+    weekRow.appendChild(dayDiv);
+  }
+}
+
+function renderPayments(){
+  payments.sort((a,b)=> new Date(a.date) - new Date(b.date));
+
+  paymentsList.innerHTML = "";
+  historyEl.innerHTML = "";
+  allPayments.innerHTML = "";
+
+  historial.forEach(h=>{
+    const li = document.createElement("li");
+    li.textContent = h;
+    historyEl.appendChild(li);
+  });
+
+  payments.forEach((p, index)=>{
+    const diasFaltantes = calcularDiasFaltantes(p.date);
+    let color = "--ok"; 
+    if(diasFaltantes < 1) color = "--danger";
+    else if(diasFaltantes <=5) color = "--warn";
+
+    const li = document.createElement("li");
+    li.innerHTML = `${p.name} — $${p.amount}<br><span style="color:var(${color})">Vence en ${diasFaltantes>=0?diasFaltantes:"0"} días</span>`;
+    paymentsList.appendChild(li);
+
+    const allLi = document.createElement("li");
+    allLi.innerHTML = `${p.name} — $${p.amount} — ${formatearFecha(p.date)} <button onclick="editPayment(${index})">Editar</button>`;
+    allPayments.appendChild(allLi);
+  });
+
+  if(payments.length > 0){
+    const next = payments[0];
+    const diasFaltantes = calcularDiasFaltantes(next.date);
+    let color = "--ok";
+    if(diasFaltantes < 1) color = "--danger";
+    else if(diasFaltantes <=5) color = "--warn";
+    nextAmount.textContent = `$${next.amount}`;
+    nextDays.textContent = diasFaltantes >= 0 ? `Vence en ${diasFaltantes} días` : "Vencido";
+    nextDays.style.color = `var(${color})`;
+    nextDesc.textContent = next.name;
+  } else {
+    nextAmount.textContent = "—";
+    nextDays.textContent = "—";
+    nextDesc.textContent = "—";
+  }
+
+  renderWeek();
+  guardarStorage(); // ✅ guardar cambios
+}
+
+// Modal Agregar/Editar
+const modal = document.getElementById("payment-modal");
+const addBtn = document.getElementById("add-payment");
+const closeModal = document.getElementById("close-modal");
+const saveBtn = document.getElementById("save-payment");
+const modalTitle = document.getElementById("modal-title");
+const markPaidModal = document.getElementById("mark-paid-modal");
+
+addBtn.addEventListener("click", ()=>{
+  editingIndex = null;
+  modalTitle.textContent = "Nuevo pago";
+  markPaidModal.style.display = "none"; 
+  modal.style.display = "flex";
+});
+
+closeModal.addEventListener("click", ()=> modal.style.display = "none");
+
+saveBtn.addEventListener("click", ()=>{
+  const name = document.getElementById("modal-name").value;
+  const amount = parseInt(document.getElementById("modal-amount").value);
+  const date = document.getElementById("modal-date").value;
+  if(name && amount && date){
+    if(editingIndex !== null){
+      historial.push(`Se editó el pago de ${payments[editingIndex].name}`);
+      payments[editingIndex] = {name, amount, date};
+    } else {
+      payments.push({name, amount, date});
+      historial.push(`Se agregó el pago de ${name}`);
+    }
+    renderPayments();
+    modal.style.display = "none";
+    document.getElementById("modal-name").value = "";
+    document.getElementById("modal-amount").value = "";
+    document.getElementById("modal-date").value = "";
+  }
+});
+
+function editPayment(index){
+  editingIndex = index;
+  const p = payments[index];
+  document.getElementById("modal-name").value = p.name;
+  document.getElementById("modal-amount").value = p.amount;
+  document.getElementById("modal-date").value = p.date;
+  modalTitle.textContent = "Editar pago";
+  markPaidModal.style.display = "block"; 
+  modal.style.display = "flex";
+}
+
+// Modal confirmación
+const confirmModal = document.getElementById("confirm-modal");
+const confirmYes = document.getElementById("confirm-yes");
+const confirmNo = document.getElementById("confirm-no");
+const confirmText = document.getElementById("confirm-text");
+let confirmCallback = null;
+
+document.getElementById("mark-paid").addEventListener("click", ()=>{
+  if(payments.length > 0){
+    confirmText.textContent = `¿Deseas marcar como completado el pago de "${payments[0].name}"?`;
+    confirmCallback = ()=>{
+      historial.push(`Se completó el pago de ${payments[0].name}`);
+      payments.shift();
+      renderPayments();
+    };
+    confirmModal.style.display = "flex";
+  }
+});
+
+markPaidModal.addEventListener("click", ()=>{
+  if(editingIndex !== null){
+    confirmText.textContent = `¿Deseas marcar como completado el pago de "${payments[editingIndex].name}"?`;
+    confirmCallback = ()=>{
+      historial.push(`Se completó el pago de ${payments[editingIndex].name}`);
+      payments.splice(editingIndex,1);
+      renderPayments();
+      modal.style.display = "none";
+    };
+    confirmModal.style.display = "flex";
+  }
+});
+
+confirmNo.addEventListener("click", ()=> confirmModal.style.display = "none");
+confirmYes.addEventListener("click", ()=>{
+  if(confirmCallback) confirmCallback();
+  confirmModal.style.display = "none";
+  confirmCallback = null;
+});
+
+renderPayments();
+</script>
 </body>
 </html>
