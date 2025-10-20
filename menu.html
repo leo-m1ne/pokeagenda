@@ -4,36 +4,129 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap" rel="stylesheet">
+
   <title>PokeAgenda - Menú</title>
+  <style>
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background: #FBFBFD;
+      margin: 0;
+      color: #111;
+    }
+
+    .page-header h2 {
+      margin-bottom: 12px;
+    }
+
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .menu-item {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(10,10,20,0.06);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+      text-decoration: none;
+      color: #111;
+      transition: transform 0.2s;
+    }
+
+    .menu-item:hover {
+      transform: translateY(-4px);
+    }
+
+    .menu-item img {
+      width: 80px;
+      height: 80px;
+      margin-top: 8px;
+    }
+
+    /* Mensajitos diarios */
+    .daily-message {
+      grid-column: span 2;
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(10,10,20,0.06);
+      font-weight: 500;
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      min-height: 120px;
+    }
+
+  </style>
 </head>
 <body>
   <section id="menu" class="page">
-  <header class="page-header">
-    <h2>¿Qué vas a hacer hoy?</h2>
-  </header>
-  <div class="menu-grid">
-    
-    <a href="tareas.html" class="menu-item">
-    <span class="tareas-text">Tareas</span>
-    <img src="img/pikachu.png" alt="Tareas">
-    </a>
+    <header class="page-header">
+      <h2>¿Qué vas a hacer hoy?</h2>
+    </header>
 
-    <a href="calendario.html" class="menu-item">
-    <span class="calendario-text">Calendario</span>
-    <img src="img/piplup.png" alt="Calendario">
-    </a>
+    <div class="menu-grid">
+      <a href="tareas.html" class="menu-item">
+        <span class="tareas-text">Tareas</span>
+        <img src="img/pikachu.png" alt="Tareas">
+      </a>
 
-    <a href="notas.html" class="menu-item">
-    <span class="notas-text">Notas</span>
-    <img src="img/torchic.png" alt="Notas">
-    </a>
+      <a href="calendario.html" class="menu-item">
+        <span class="calendario-text">Calendario</span>
+        <img src="img/piplup.png" alt="Calendario">
+      </a>
 
-    <a href="pagos.html" class="menu-item">
-    <span class="pagos-text">Pagos</span>
-    <img src="img/lucario.png" alt="Pagos">
-    </a>
-  </div>
-</section>
+      <a href="notas.html" class="menu-item">
+        <span class="notas-text">Notas</span>
+        <img src="img/torchic.png" alt="Notas">
+      </a>
 
+      <a href="pagos.html" class="menu-item">
+        <span class="pagos-text">Pagos</span>
+        <img src="img/lucario.png" alt="Pagos">
+      </a>
+
+      <!-- Mensajitos diarios -->
+      <div class="daily-message" id="daily-message">
+        ¡Cargando mensaje del día... 💖
+      </div>
+    </div>
+  </section>
+
+  <script src="script.js"></script>
+
+  <script>
+    const messages = [
+      "Buenos días, amorcito",
+      "Espero que tengas un día lleno de sonrisas",
+      "Te adoro más de lo que imaginas",
+      "Eres mi persona favorita del mundo",
+      "Hoy te envío un abrazo enorme",
+      "Tu Alecsito te ama muchísimo",
+      "Tu sonrisa ilumina mi día",
+      "No olvides comer rico y feliz",
+      // ... agrega hasta 365 mensajes diferentes
+    ];
+
+    // Elegir el mensaje según el día del año
+    const today = new Date();
+    const startOfYear = new Date(today.getFullYear(), 0, 0);
+    const diff = today - startOfYear;
+    const oneDay = 1000 * 60 * 60 * 24;
+    const dayOfYear = Math.floor(diff / oneDay);
+
+    const index = dayOfYear % messages.length; // para que vuelva al principio
+    document.getElementById("daily-message").textContent = messages[index];
+  </script>
 </body>
 </html>
