@@ -1,20 +1,243 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
-  <title>PokeAgenda - Notas</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<title>Notas</title>
+<style>
+:root{
+  --bg:#f7f7f7;
+  --primary:#f2a118;
+  --muted:#6B6B76;
+}
+
+body{
+  margin:0; padding:0 0 12px; font-family:Inter, system-ui, sans-serif; background:var(--bg); color:#111;
+}
+
+.page-header{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  background:var(--primary);
+  color:#ffffff;
+  padding:16px;
+  font-size:1.4rem;
+  font-weight:700;
+  margin-bottom:14px;
+  border-radius:0;
+  box-shadow:0 4px 12px rgba(10,10,20,0.1);
+  width:100%;
+  position:sticky;
+  top:0;
+  left:0;
+  z-index:10;
+}
+
+.back-arrow{
+  background:none;
+  border:none;
+  font-size: 20px;
+  font-weight: 900;
+  color:#20170f;
+}
+
+.back-arrow:hover{
+  transform:translateX(-3px);
+}
+
+.notes-container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+.note-card{
+  background:#fff;
+  border-radius:12px;
+  padding:12px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+  min-width:200px;
+  flex:1;
+  cursor:pointer;
+}
+
+.note-card h4{
+  margin:0 0 6px 0;
+  color:#7c5a37;
+}
+
+.note-card p{
+  margin:0;
+  color:#555;
+  font-size:0.9rem;
+}
+
+.add-note-btn{
+  padding:10px 15px;
+  background:var(--primary);
+  color:#fff;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  margin-bottom:12px;
+}
+
+.modal{
+  display:none;
+  position:fixed;
+  top:0; left:0; right:0; bottom:0;
+  background:rgba(0,0,0,0.5);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:10px;
+  max-width:350px;
+  width:90%;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.modal-content input, .modal-content textarea{
+  width:100%;
+  padding:6px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  box-sizing:border-box;
+}
+
+.modal-content button{
+  margin-top:12px;
+  padding:8px 12px;
+  border:none;
+  border-radius:6px;
+  background:#fad54a;
+  color:#fff;
+  cursor:pointer;
+}
+
+.modal-content .secondary{
+  background:#999;
+}
+
+.modal-content .danger{
+  background:#c0392b;
+}
+</style>
 </head>
 <body>
-  <section id="notas" class="page">
-    <header class="page-header">
-      <h2>Notas</h2>
-    </header>
-    <div class="content">
-      <p>Aquí aparecerán tus notas...</p>
-      <a href="menu.html" class="btn">Volver al menú</a>
-    </div>
-  </section>
+<header class="page-header">
+  <button class="back-arrow" onclick="window.location.href='menu.html'">
+    <i class="fa-solid fa-chevron-left"></i>
+  </button>
+  Notas
+</header>
+
+
+  <button class="add-note-btn" id="addNoteBtn">Agregar Nota</button>
+
+
+<div class="notes-container" id="notesContainer">
+  <!-- Las notas aparecerán aquí -->
+</div>
+
+<!-- Modal agregar / editar nota -->
+<div class="modal" id="noteModal">
+  <div class="modal-content">
+    <h3 id="modalTitle">Nueva Nota</h3>
+    <input type="text" id="noteTitle" placeholder="Título">
+    <textarea id="noteContent" rows="4" placeholder="Escribe tu nota..."></textarea>
+    <button id="saveNoteBtn">Guardar</button>
+    <button id="deleteNoteBtn" class="danger">Eliminar</button>
+    <button id="closeNoteModalBtn" class="secondary">Cancelar</button>
+  </div>
+</div>
+
+<script>
+let notes = JSON.parse(localStorage.getItem('notes')) || [];
+let editingIndex = null;
+
+const notesContainer = document.getElementById('notesContainer');
+const noteModal = document.getElementById('noteModal');
+const modalTitle = document.getElementById('modalTitle');
+const noteTitleInput = document.getElementById('noteTitle');
+const noteContentInput = document.getElementById('noteContent');
+const saveNoteBtn = document.getElementById('saveNoteBtn');
+const deleteNoteBtn = document.getElementById('deleteNoteBtn');
+const closeNoteModalBtn = document.getElementById('closeNoteModalBtn');
+const addNoteBtn = document.getElementById('addNoteBtn');
+
+function renderNotes(){
+  notesContainer.innerHTML='';
+  if(notes.length===0){
+    notesContainer.innerHTML='<p style="color:#aaa;">Aún no has agregado ninguna nota.</p>';
+    return;
+  }
+  notes.forEach((note,index)=>{
+    const div = document.createElement('div');
+    div.className='note-card';
+    div.innerHTML=`<h4>${note.title || 'Sin título'}</h4><p>${note.content}</p>`;
+    div.addEventListener('click', ()=>{
+      editingIndex = index;
+      modalTitle.textContent='Editar Nota';
+      noteTitleInput.value = note.title;
+      noteContentInput.value = note.content;
+      deleteNoteBtn.style.display='block';
+      noteModal.style.display='flex';
+    });
+    notesContainer.appendChild(div);
+  });
+}
+
+addNoteBtn.addEventListener('click', ()=>{
+  editingIndex=null;
+  modalTitle.textContent='Nueva Nota';
+  noteTitleInput.value='';
+  noteContentInput.value='';
+  deleteNoteBtn.style.display='none';
+  noteModal.style.display='flex';
+});
+
+saveNoteBtn.addEventListener('click', ()=>{
+  const title = noteTitleInput.value.trim();
+  const content = noteContentInput.value.trim();
+  if(!title && !content) return;
+  if(editingIndex!==null){
+    notes[editingIndex]={title,content};
+  }else{
+    notes.push({title,content});
+  }
+  localStorage.setItem('notes',JSON.stringify(notes));
+  renderNotes();
+  noteModal.style.display='none';
+});
+
+deleteNoteBtn.addEventListener('click', ()=>{
+  if(editingIndex!==null){
+    if(confirm("¿Deseas eliminar esta nota?")){
+      notes.splice(editingIndex,1);
+      localStorage.setItem('notes',JSON.stringify(notes));
+      renderNotes();
+      noteModal.style.display='none';
+    }
+  }
+});
+
+closeNoteModalBtn.addEventListener('click', ()=>{noteModal.style.display='none';});
+
+window.addEventListener('click', e=>{
+  if(e.target===noteModal) noteModal.style.display='none';
+});
+
+renderNotes();
+</script>
+
 </body>
 </html>
