@@ -7,10 +7,10 @@ body {
 
 #welcome {
   display: flex;
-  flex-direction: column;
+  flex-direction: column; 
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: 80vh;
   background: none;
 }
 
@@ -47,7 +47,6 @@ body {
   top: 0;
   left: 0;
   width: 100%;
-  background: linear-gradient(to right, #273474, #4354A5);
   padding: 10px;
   text-align: center;
   font-size: 0.9rem;
@@ -99,7 +98,6 @@ body {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: #303C7C;
   display: flex;
   justify-content: center;
   align-items: center;
