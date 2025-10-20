@@ -4,11 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-<title>Notas</title>
+
+<title>Organizador de Tareas</title>
 <style>
 :root{
-  --bg:#f7f7f7;
-  --primary:#f2a118;
+  --bg:#FBFBFD;
+  --primary:#fdd92a;
+  --ok:#27A96B;
+  --warn:#F0A500;
+  --danger:#E94F4F;
   --muted:#6B6B76;
 }
 
@@ -16,12 +20,13 @@ body{
   margin:0; padding:0 0 12px; font-family:Inter, system-ui, sans-serif; background:var(--bg); color:#111;
 }
 
+/* 🌸 Encabezado */
 .page-header{
   display:flex;
   align-items:center;
   gap:8px;
   background:var(--primary);
-  color:#ffffff;
+  color:#20170f;
   padding:16px;
   font-size:1.4rem;
   font-weight:700;
@@ -47,48 +52,71 @@ body{
   transform:translateX(-3px);
 }
 
-.notes-container{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-}
-
-.note-card{
+.card{
   background:#fff;
   border-radius:12px;
-  padding:12px;
-  box-shadow:0 2px 6px rgba(0,0,0,0.1);
-  min-width:200px;
-  flex:1;
-  cursor:pointer;
+  box-shadow:0 4px 12px rgba(10,10,20,0.06);
+  padding:14px;
+  margin-bottom:12px;
 }
 
-.note-card h4{
+.card h3{
   margin:0 0 6px 0;
-  color:#7c5a37;
+  font-size:1.1rem;
 }
 
-.note-card p{
-  margin:0;
-  color:#555;
-  font-size:0.9rem;
+.task-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px solid #eee;
 }
 
-.add-note-btn{
-  padding:10px 15px;
-  background:var(--primary);
-  color:#fff;
+.task-row:last-child{
+  border-bottom:none;
+}
+
+.task-name{
+  font-weight:600;
+}
+
+.task-date{
+  font-size:0.85rem;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.task-btn{
+  font-size:0.75rem;
+  padding:6px 8px;
   border:none;
   border-radius:8px;
   cursor:pointer;
+  margin-left:6px;
+}
+
+.task-btn.edit{background:var(--primary); color:#fff;}
+.task-btn.delete{background:var(--danger); color:#fff;}
+
+.add-task-btn{
+  background:var(--primary);
+  color:#20170f;
+  font-size:1.2rem;
+  border:none;
+  border-radius:12px;
+  padding:12px;
+  width:100%;
   margin-bottom:12px;
+  cursor:pointer;
 }
 
 .modal{
   display:none;
   position:fixed;
-  top:0; left:0; right:0; bottom:0;
-  background:rgba(0,0,0,0.5);
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.4);
   justify-content:center;
   align-items:center;
   z-index:1000;
@@ -96,147 +124,191 @@ body{
 
 .modal-content{
   background:#fff;
-  padding:20px;
-  border-radius:10px;
-  max-width:350px;
+  border-radius:12px;
+  padding:16px;
   width:90%;
+  max-width:400px;
   display:flex;
   flex-direction:column;
   gap:8px;
 }
 
 .modal-content input, .modal-content textarea{
-  width:100%;
-  padding:6px;
+  padding:8px;
+  border-radius:8px;
   border:1px solid #ccc;
-  border-radius:6px;
+  width:100%;
   box-sizing:border-box;
-}
-
-.modal-content button{
-  margin-top:12px;
-  padding:8px 12px;
-  border:none;
-  border-radius:6px;
-  background:#fad54a;
-  color:#fff;
-  cursor:pointer;
-}
-
-.modal-content .secondary{
-  background:#999;
-}
-
-.modal-content .danger{
-  background:#c0392b;
 }
 </style>
 </head>
+
 <body>
+
 <header class="page-header">
   <button class="back-arrow" onclick="window.location.href='menu.html'">
     <i class="fa-solid fa-chevron-left"></i>
   </button>
-  Notas
+  Organizador de Tareas
 </header>
 
+<button class="add-task-btn" id="add-task">+ Agregar tarea</button>
 
-  <button class="add-note-btn" id="addNoteBtn">Agregar Nota</button>
-
-
-<div class="notes-container" id="notesContainer">
-  <!-- Las notas aparecerán aquí -->
+<div class="card">
+  <h3>Tareas por completar</h3>
+  <div id="active-tasks"></div>
 </div>
 
-<!-- Modal agregar / editar nota -->
-<div class="modal" id="noteModal">
+<div class="card">
+  <h3>Tareas completadas</h3>
+  <div id="completed-tasks"></div>
+</div>
+
+<!-- Modal Agregar/Editar -->
+<div class="modal" id="task-modal">
   <div class="modal-content">
-    <h3 id="modalTitle">Nueva Nota</h3>
-    <input type="text" id="noteTitle" placeholder="Título">
-    <textarea id="noteContent" rows="4" placeholder="Escribe tu nota..."></textarea>
-    <button id="saveNoteBtn">Guardar</button>
-    <button id="deleteNoteBtn" class="danger">Eliminar</button>
-    <button id="closeNoteModalBtn" class="secondary">Cancelar</button>
+    <h3 id="modal-title">Nueva tarea</h3>
+    <input type="text" id="task-name" placeholder="Nombre de la tarea">
+    <textarea id="task-desc" placeholder="Descripción"></textarea>
+    <input type="date" id="task-date">
+    <button id="save-task">Guardar</button>
+    <button id="close-modal">Cancelar</button>
+  </div>
+</div>
+
+<!-- Modal Confirmación -->
+<div class="modal" id="confirm-modal">
+  <div class="modal-content">
+    <h3>Confirmar acción</h3>
+    <p id="confirm-text"></p>
+    <button id="confirm-yes">Sí</button>
+    <button id="confirm-no">No</button>
   </div>
 </div>
 
 <script>
-let notes = JSON.parse(localStorage.getItem('notes')) || [];
+let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
 let editingIndex = null;
+const activeTasks = document.getElementById("active-tasks");
+const completedTasks = document.getElementById("completed-tasks");
 
-const notesContainer = document.getElementById('notesContainer');
-const noteModal = document.getElementById('noteModal');
-const modalTitle = document.getElementById('modalTitle');
-const noteTitleInput = document.getElementById('noteTitle');
-const noteContentInput = document.getElementById('noteContent');
-const saveNoteBtn = document.getElementById('saveNoteBtn');
-const deleteNoteBtn = document.getElementById('deleteNoteBtn');
-const closeNoteModalBtn = document.getElementById('closeNoteModalBtn');
-const addNoteBtn = document.getElementById('addNoteBtn');
+const taskModal = document.getElementById("task-modal");
+const addTaskBtn = document.getElementById("add-task");
+const closeModal = document.getElementById("close-modal");
+const saveTaskBtn = document.getElementById("save-task");
+const modalTitle = document.getElementById("modal-title");
 
-function renderNotes(){
-  notesContainer.innerHTML='';
-  if(notes.length===0){
-    notesContainer.innerHTML='<p style="color:#aaa;">Aún no has agregado ninguna nota.</p>';
-    return;
-  }
-  notes.forEach((note,index)=>{
-    const div = document.createElement('div');
-    div.className='note-card';
-    div.innerHTML=`<h4>${note.title || 'Sin título'}</h4><p>${note.content}</p>`;
-    div.addEventListener('click', ()=>{
-      editingIndex = index;
-      modalTitle.textContent='Editar Nota';
-      noteTitleInput.value = note.title;
-      noteContentInput.value = note.content;
-      deleteNoteBtn.style.display='block';
-      noteModal.style.display='flex';
-    });
-    notesContainer.appendChild(div);
+const confirmModal = document.getElementById("confirm-modal");
+const confirmText = document.getElementById("confirm-text");
+const confirmYes = document.getElementById("confirm-yes");
+const confirmNo = document.getElementById("confirm-no");
+let confirmCallback = null;
+
+function saveToLocalStorage(){
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
+
+function formatFecha(fecha){
+  const d = new Date(fecha);
+  const options = { day:'numeric', month:'short', year:'numeric' };
+  return d.toLocaleDateString('es-MX', options);
+}
+
+function renderTasks(){
+  activeTasks.innerHTML = "";
+  completedTasks.innerHTML = "";
+
+  tasks.forEach((t,index)=>{
+    const taskDiv = document.createElement("div");
+    taskDiv.className = "task-row";
+    taskDiv.innerHTML = `
+      <div>
+        <input type="checkbox" ${t.completed?'checked':''} onchange="toggleComplete(${index},this)">
+        <span class="task-name">${t.name}</span>
+        <div class="task-date">${formatFecha(t.date)}</div>
+      </div>
+      <div>
+        <button class="task-btn edit" onclick="editTask(${index})">Editar</button>
+        <button class="task-btn delete" onclick="deleteTask(${index})">Eliminar</button>
+      </div>
+    `;
+    if(t.completed){
+      completedTasks.appendChild(taskDiv);
+    } else {
+      activeTasks.appendChild(taskDiv);
+    }
   });
 }
 
-addNoteBtn.addEventListener('click', ()=>{
-  editingIndex=null;
-  modalTitle.textContent='Nueva Nota';
-  noteTitleInput.value='';
-  noteContentInput.value='';
-  deleteNoteBtn.style.display='none';
-  noteModal.style.display='flex';
+addTaskBtn.addEventListener("click", ()=>{
+  editingIndex = null;
+  modalTitle.textContent = "Nueva tarea";
+  taskModal.style.display = "flex";
 });
 
-saveNoteBtn.addEventListener('click', ()=>{
-  const title = noteTitleInput.value.trim();
-  const content = noteContentInput.value.trim();
-  if(!title && !content) return;
-  if(editingIndex!==null){
-    notes[editingIndex]={title,content};
-  }else{
-    notes.push({title,content});
-  }
-  localStorage.setItem('notes',JSON.stringify(notes));
-  renderNotes();
-  noteModal.style.display='none';
-});
+closeModal.addEventListener("click", ()=> taskModal.style.display = "none");
 
-deleteNoteBtn.addEventListener('click', ()=>{
-  if(editingIndex!==null){
-    if(confirm("¿Deseas eliminar esta nota?")){
-      notes.splice(editingIndex,1);
-      localStorage.setItem('notes',JSON.stringify(notes));
-      renderNotes();
-      noteModal.style.display='none';
+saveTaskBtn.addEventListener("click", ()=>{
+  const name = document.getElementById("task-name").value;
+  const desc = document.getElementById("task-desc").value;
+  const date = document.getElementById("task-date").value;
+  if(name && date){
+    if(editingIndex !== null){
+      tasks[editingIndex] = {name, desc, date, completed:tasks[editingIndex].completed};
+    } else {
+      tasks.push({name, desc, date, completed:false});
     }
+    saveToLocalStorage();
+    renderTasks();
+    taskModal.style.display = "none";
+    document.getElementById("task-name").value="";
+    document.getElementById("task-desc").value="";
+    document.getElementById("task-date").value="";
   }
 });
 
-closeNoteModalBtn.addEventListener('click', ()=>{noteModal.style.display='none';});
+function editTask(index){
+  editingIndex = index;
+  const t = tasks[index];
+  document.getElementById("task-name").value = t.name;
+  document.getElementById("task-desc").value = t.desc;
+  document.getElementById("task-date").value = t.date;
+  modalTitle.textContent = "Editar tarea";
+  taskModal.style.display = "flex";
+}
 
-window.addEventListener('click', e=>{
-  if(e.target===noteModal) noteModal.style.display='none';
+function toggleComplete(index, checkbox){
+  const newState = checkbox.checked;
+  confirmText.textContent = newState 
+    ? `¿Marcar como completada la tarea "${tasks[index].name}"?` 
+    : `¿Marcar como pendiente la tarea "${tasks[index].name}"?`;
+  confirmCallback = ()=>{
+    tasks[index].completed = newState;
+    saveToLocalStorage();
+    renderTasks();
+  };
+  confirmModal.style.display = "flex";
+  checkbox.checked = !newState;
+}
+
+function deleteTask(index){
+  confirmText.textContent = `¿Eliminar la tarea "${tasks[index].name}"?`;
+  confirmCallback = ()=>{
+    tasks.splice(index,1);
+    saveToLocalStorage();
+    renderTasks();
+  };
+  confirmModal.style.display = "flex";
+}
+
+confirmNo.addEventListener("click", ()=> confirmModal.style.display="none");
+confirmYes.addEventListener("click", ()=>{
+  if(confirmCallback) confirmCallback();
+  confirmCallback = null;
+  confirmModal.style.display="none";
 });
 
-renderNotes();
+renderTasks();
 </script>
 
 </body>
