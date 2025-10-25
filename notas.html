@@ -21,14 +21,12 @@ body{
   align-items:center;
   gap:8px;
   background:var(--primary);
-  color:#ffffff;
+  color:#e7e7e7;
   padding:16px;
   font-size:1.4rem;
   font-weight:700;
-  margin-bottom:14px;
   border-radius:0;
   box-shadow:0 4px 12px rgba(10,10,20,0.1);
-  width:100%;
   position:sticky;
   top:0;
   left:0;
@@ -130,6 +128,10 @@ body{
 .modal-content .danger{
   background:#c0392b;
 }
+
+.page-notes{
+  padding: 15px;
+}
 </style>
 </head>
 <body>
@@ -140,7 +142,7 @@ body{
   Notas
 </header>
 
-
+<div class="page-notes">
   <button class="add-note-btn" id="addNoteBtn">Agregar Nota</button>
 
 
@@ -159,6 +161,9 @@ body{
     <button id="closeNoteModalBtn" class="secondary">Cancelar</button>
   </div>
 </div>
+</div>
+
+  
 
 <script>
 let notes = JSON.parse(localStorage.getItem('notes')) || [];
