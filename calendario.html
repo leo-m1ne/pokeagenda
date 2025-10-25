@@ -20,14 +20,12 @@ body{
   align-items:center;
   gap:8px;
   background:var(--primary);
-  color:#16171a;
+  color:#e7e7e7;
   padding:16px;
   font-size:1.4rem;
   font-weight:700;
-  margin-bottom:14px;
   border-radius:0;
   box-shadow:0 4px 12px rgba(10,10,20,0.1);
-  width:100%;
   position:sticky;
   top:0;
   left:0;
@@ -38,7 +36,7 @@ body{
   border:none;
   font-size: 20px;
   font-weight: 900;
-  color:#20170f;
+  color:#e7e7e7;
 }
 
 .back-arrow:hover{
@@ -180,6 +178,10 @@ body{
 .modal-content .danger{
   background:#c0392b;
 }
+
+.page-calendar{
+  padding: 18px;
+}
 </style>
 </head>
 <body>
@@ -191,11 +193,12 @@ body{
   Calendario
 </header>
 
-<div class="calendar-box">
+<div class="page-calendar">
+  <div class="calendar-box">
   <div class="calendar-header">
-    <button id="prevMonth">&#8592;</button>
+    <button id="prevMonth"><i class="fa-solid fa-chevron-left"></i></button>
     <h3 id="monthYear"></h3>
-    <button id="nextMonth">&#8594;</button>
+    <button id="nextMonth"><i class="fa-solid fa-chevron-right"></i></button>
   </div>
   <div class="calendar-grid" id="calendarDays"></div>
 </div>
@@ -236,6 +239,10 @@ body{
     </div>
   </div>
 </div>
+
+</div>
+
+
 
 <script>
 let events = JSON.parse(localStorage.getItem('events')) || [];
