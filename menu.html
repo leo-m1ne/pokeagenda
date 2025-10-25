@@ -34,7 +34,18 @@
       font-weight: 400;
       font-size: 0.9rem;
       min-height: 120px;
+      position: relative;
+      overflow: hidden;
     }
+
+.daily-message::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("img/torchicc.png") center/cover no-repeat;;
+  opacity: 0.15;
+  pointer-events: none;
+}
 
   </style>
 </head>
