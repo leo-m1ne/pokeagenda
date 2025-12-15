@@ -18,7 +18,7 @@ function setGreeting() {
   let headerTextColor = "";
 
   if (hour >= 6 && hour < 12) {
-    message = "¡Buenos días, Luna!";
+    message = "¡Buenos días, Leo!";
     bgColor = "linear-gradient(to bottom right, #3F2774, #5843A5)";
     iconClass = "fa-heart";
     iconColor = "#ADA1C8";
@@ -27,7 +27,7 @@ function setGreeting() {
     headerBg = "rgba(88, 67, 165, 1)";
     headerTextColor = "#ffffffff"; 
   } else if (hour >= 12 && hour < 18) {
-    message = "¡Buenas tardes, Luna!";
+    message = "¡Buenas tardes, Leo!";
     bgColor = "linear-gradient(to bottom right, #2B7427, #48A543)";
     iconClass = "fa-sun";
     iconColor = "#A4C8A1";
@@ -36,7 +36,7 @@ function setGreeting() {
     headerBg = "#48A543";
     headerTextColor = "#FFFFFF"; 
   } else {
-    message = "¡Buenas noches, Luna!";
+    message = "¡Buenas noches, Leo!";
     bgColor = "linear-gradient(to bottom right, #273474, #4354A5)";
     iconClass = "fa-moon";
     iconColor = "#A1A8C8";
