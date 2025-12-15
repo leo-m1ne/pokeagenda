@@ -18,32 +18,32 @@ function setGreeting() {
   let headerTextColor = "";
 
   if (hour >= 6 && hour < 12) {
-    message = "¡Buenos días, Leo!";
+    message = "¡Buenos días, Luna!";
     bgColor = "linear-gradient(to bottom right, #3F2774, #5843A5)";
     iconClass = "fa-heart";
     iconColor = "#ADA1C8";
     btnColor = "#41307F";
     circleColor = "#41307F";
     headerBg = "rgba(88, 67, 165, 1)";
-    headerTextColor = "#ffffffff"; // color dorado para el día
+    headerTextColor = "#ffffffff"; 
   } else if (hour >= 12 && hour < 18) {
-    message = "¡Buenas tardes, Leo!";
+    message = "¡Buenas tardes, Luna!";
     bgColor = "linear-gradient(to bottom right, #2B7427, #48A543)";
     iconClass = "fa-sun";
     iconColor = "#A4C8A1";
     btnColor = "#347F30";
     circleColor = "#2B7427";
     headerBg = "#48A543";
-    headerTextColor = "#FFFFFF"; // blanco para la tarde
+    headerTextColor = "#FFFFFF"; 
   } else {
-    message = "¡Buenas noches, Leo!";
+    message = "¡Buenas noches, Luna!";
     bgColor = "linear-gradient(to bottom right, #273474, #4354A5)";
     iconClass = "fa-moon";
     iconColor = "#A1A8C8";
     btnColor = "#303C7C";
     circleColor = "#303C7C";
     headerBg = "#4354A5";
-    headerTextColor = "#ffffffff"; // gris claro para la noche
+    headerTextColor = "#ffffffff";
   }
 
   // Actualiza el header
@@ -52,7 +52,6 @@ function setGreeting() {
     pageHeader.style.color = headerTextColor;
   }
 
-  // Actualiza los demás elementos si existen
   if (greeting) greeting.textContent = message;
   if (icon) {
     icon.className = `fas ${iconClass}`;
